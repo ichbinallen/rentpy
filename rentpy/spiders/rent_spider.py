@@ -1,7 +1,7 @@
 import scrapy
 
 
-class QuotesSpider(scrapy.Spider):
+class RentSpider(scrapy.Spider):
     name = "listprice"
     part1 = "htt" + "ps://w" + "ww.re"
     part2 = "dfi" + "n.com"
@@ -11,16 +11,14 @@ class QuotesSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-
-        homes = response.css('div.HomeCardContainer div.bottomV2')
+        homes = response.css("div.HomeCardContainer div.bottomV2")
         for home in homes:
-
             price = home.css("div.bottomV2 span.homecardV2Price::text").get()
-            stats = home.css('div.HomeStatsV2 div.stats::text').getall()
+            stats = home.css("div.HomeStatsV2 div.stats::text").getall()
             beds = stats[0]
             baths = stats[1]
             area = stats[2]
-            address = home.css('a div.link-and-anchor::text').get()
+            address = home.css("a div.link-and-anchor::text").get()
 
             yield {
                 "price": price,
