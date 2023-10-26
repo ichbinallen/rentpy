@@ -19,6 +19,10 @@ class RentSpider(scrapy.Spider):
             baths = stats[1]
             area = stats[2]
             address = home.css("a div.link-and-anchor::text").get()
+            url = home.css("a").attrib.get("href")
+            part1 = "htt" + "ps://w" + "ww.re"
+            part2 = "dfi" + "n.com"
+            url = part1 + part2 + url
 
             yield {
                 "price": price,
@@ -26,4 +30,5 @@ class RentSpider(scrapy.Spider):
                 "baths": baths,
                 "area": area,
                 "address": address,
+                "url": url,
             }
