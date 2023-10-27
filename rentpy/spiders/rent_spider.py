@@ -1,20 +1,18 @@
 import scrapy
+from ..utils import green_dorsal
 
 
 class RentSpider(scrapy.Spider):
     name = "listprice"
-    part1 = "htt" + "ps://w" + "ww.re"
-    part2 = "dfi" + "n.com"
-    base_url = part1 + part2
+
+    base_url = green_dorsal()
     city_url = "/city/1387/WA/Bellevue"
     start_urls = [
-        f"{part1}{part2}{city_url}",
+        f"{base_url}{city_url}",
     ]
 
     def parse(self, response):
-        part1 = "htt" + "ps://w" + "ww.re"
-        part2 = "dfi" + "n.com"
-        base_url = part1 + part2
+        base_url = green_dorsal()
         city_url = "/city/1387/WA/Bellevue"
 
         homes = response.css("div.HomeCardContainer div.bottomV2")
