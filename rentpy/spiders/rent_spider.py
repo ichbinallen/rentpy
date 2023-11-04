@@ -26,14 +26,7 @@ class RentSpider(scrapy.Spider):
             home_url = home.css("a").attrib.get("href")
             home_url = base_url + home_url
 
-            yield {
-                "price": price,
-                "beds": beds,
-                "baths": baths,
-                "area": area,
-                "address": address,
-                "url": home_url,
-            }
+            yield response.follow(home_url, callback=self.parse_home)
 
         page_locator = response.css("div.viewingPage span.pageText::text").re(
             "Viewing page (\d+) of (\d+)"
@@ -44,5 +37,45 @@ class RentSpider(scrapy.Spider):
 
         if current_page < last_page:
             next_page = f"{base_url}{city_url}/page-{str(next_page)}"
-            print(next_page)
             yield response.follow(next_page, callback=self.parse)
+
+    def parse_home(self, response):
+        street_address = response.css("h1.full-address div.street-address::text").get()
+        city, _, state, _, zipcode = response.css(
+            "h1.full-address div.bp-cityStateZip::text"
+        ).getall()
+        home_stats = response.css("div.home-main-stats-variant")
+        listprice = (
+            home_stats.css("div.stat-block")[0]
+            .css("div.stat-block div.statsValue::text")
+            .get()
+        )
+        num_beds = (
+            home_stats.css("div.stat-block")[1]
+            .css("div.stat-block div.statsValue::text")
+            .get()
+        )
+        num_baths = (
+            home_stats.css("div.stat-block")[2]
+            .css("div.stat-block div.statsValue::text")
+            .get()
+        )
+        area = (
+            home_stats.css("div.stat-block")[3]
+            .css("div.stat-block span.statsValue::text")
+            .get()
+        )
+        listing_text = response.css("div.remarks p span::text").get()
+        home_stats_dict = {
+            "url": response.url,
+            "street_address": street_address,
+            "city": city,
+            "state": state,
+            "zipcode": zipcode,
+            "listprice": listprice,
+            "num_beds": num_beds,
+            "baths": num_baths,
+            "sq_ft": area,
+            "listing_text": listing_text,
+        }
+        yield home_stats_dict
