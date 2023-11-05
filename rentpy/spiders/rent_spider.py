@@ -1,5 +1,6 @@
 import scrapy
-from ..utils import green_dorsal
+from rentpy.items import HomeItem
+from rentpy.utils import green_dorsal
 
 
 class RentSpider(scrapy.Spider):
@@ -17,12 +18,12 @@ class RentSpider(scrapy.Spider):
 
         homes = response.css("div.HomeCardContainer div.bottomV2")
         for home in homes:
-            price = home.css("div.bottomV2 span.homecardV2Price::text").get()
-            stats = home.css("div.HomeStatsV2 div.stats::text").getall()
-            beds = stats[0]
-            baths = stats[1]
-            area = stats[2]
-            address = home.css("a div.link-and-anchor::text").get()
+            # price = home.css("div.bottomV2 span.homecardV2Price::text").get()
+            # stats = home.css("div.HomeStatsV2 div.stats::text").getall()
+            # beds = stats[0]
+            # baths = stats[1]
+            # area = stats[2]
+            # address = home.css("a div.link-and-anchor::text").get()
             home_url = home.css("a").attrib.get("href")
             home_url = base_url + home_url
 
@@ -66,16 +67,17 @@ class RentSpider(scrapy.Spider):
             .get()
         )
         listing_text = response.css("div.remarks p span::text").get()
-        home_stats_dict = {
-            "url": response.url,
-            "street_address": street_address,
-            "city": city,
-            "state": state,
-            "zipcode": zipcode,
-            "listprice": listprice,
-            "num_beds": num_beds,
-            "baths": num_baths,
-            "sq_ft": area,
-            "listing_text": listing_text,
-        }
-        yield home_stats_dict
+
+        home_item = HomeItem()
+        home_item["url"] = response.url
+        home_item["street_address"] = street_address
+        home_item["city"] = city
+        home_item["state"] = state
+        home_item["zipcode"] = zipcode
+        home_item["listprice"] = listprice
+        home_item["num_beds"] = num_beds
+        home_item["num_baths"] = num_baths
+        home_item["sq_ft"] = area
+        home_item["listing_text"] = listing_text
+
+        yield home_item
